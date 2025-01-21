@@ -5,23 +5,20 @@ import { MyEvent } from '../../shared/interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
 
 @Component({
-  selector: 'event-detail',
   standalone: true,
+  selector: 'event-detail',
   imports: [EventCardComponent],
   templateUrl: './event-detail.component.html',
-  styleUrl: './event-detail.component.css'
+  styleUrl: './event-detail.component.css',
 })
 export class EventDetailComponent {
-
   #title = inject(Title);
   #router = inject(Router);
 
   event = input.required<MyEvent>();
 
   constructor() {
-    effect(() =>
-      this.#title.setTitle(this.event().title + ' | SvTickets')
-    );
+    effect(() => this.#title.setTitle(this.event().title + ' | SvTickets'));
   }
 
   goBack() {
@@ -40,7 +37,6 @@ export class EventDetailComponent {
 //  </div>
 //  <button type="submit" class="btn btn-primary mt-3">Send</button>
 //  </form>
-
 
 //Add this css to comments template
 // user-info {

@@ -2,6 +2,7 @@
   <div class="container-fluid">
     <a class="navbar-brand" [routerLink]="['/events']">{{ title }}</a>
     <ul class="navbar-nav me-auto">
+      @if (loggedCheck()){
       <li class="nav-item">
         <a class="nav-link" [routerLink]="['/events']" [routerLinkActive]="['active']"
           [routerLinkActiveOptions]="{ exact: true }">
@@ -13,6 +14,10 @@
           New event
         </a>
       </li>
+      }
+    </ul>
+    <ul class="navbar-nav">
+      @if (!loggedCheck()) {
       <li class="nav-item">
         <a class="nav-link" [routerLink]="['/auth/login']" [routerLinkActive]="['active']">
           Login
@@ -23,11 +28,14 @@
           Register
         </a>
       </li>
+      }
+      @if (loggedCheck()) {
       <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/auth/login']" [routerLinkActive]="['active']" onclick="logout()">
+        <a class="nav-link" [routerLinkActive]="['active']" id="logout" (click)="logout()" (keydown.enter)="logout()" tabindex="0" style="cursor: pointer;">
           Logout
         </a>
       </li>
+      }
     </ul>
   </div>
 </nav>

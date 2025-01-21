@@ -5,46 +5,42 @@
   aspect-ratio: 16 / 10;
 }
 
-.card-title a {
-  text-decoration: none;
-}
-
 .card-body {
   position: relative;
 
   button.delete {
-    box-sizing: content-box;
-    border-radius: 50%;
-    padding: 6px;
-    position: absolute;
-    top: -14px;
-    right: 12px;
-    width: 16px;
-    height: 16px;
-    transition: all 0.5s ease-out;
-    white-space: nowrap;
-    overflow: hidden;
-    text-align: center;
-    line-height: 1em;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+      box-sizing: content-box;
+      border-radius: 50%;
+      padding: 6px;
+      position: absolute;
+      top: -14px;
+      right: 12px;
+      width: 16px;
+      height: 16px;
+      transition: all 0.5s ease-out;
+      white-space: nowrap;
+      overflow: hidden;
+      text-align: center;
+      line-height: 1em;
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 
-    &:hover {
-        border-radius: 12px;
-        padding-left: 8px;
-        padding-right: 8px;
-        width: 68px;
+      &:hover {
+          border-radius: 12px;
+          padding-left: 8px;
+          padding-right: 8px;
+          width: 68px;
 
-        &::before {
-            content: ' Delete ';
-            font-size: 0.8em;
-            position: relative;
-            top: -1px;
-        }
-    }
+          &::before {
+              content: " Delete ";
+              font-size: 0.8em;
+              position: relative;
+              top: -1px;
+          }
+      }
   }
 
   .card-text {
-    white-space: pre-wrap;
+      white-space: pre-wrap;
   }
 }
 
@@ -52,17 +48,27 @@
   font-size: smaller;
 
   .avatar img {
-    width: 40px;
-    cursor: pointer;
+      width: 40px;
+      cursor: pointer;
   }
 
   .name a {
-    color: #385898;
-    font-weight: bold;
-    text-decoration: none;
+      color: #385898;
+      font-weight: bold;
+      text-decoration: none;
 
-    &:hover {
-      text-decoration: underline;
-    }
+      &:hover {
+          text-decoration: underline;
+      }
+  }
+}
+
+.card-title a {
+  text-decoration: none;
+}
+
+.attend-button {
+  &:hover {
+      cursor: pointer;
   }
 }

@@ -5,7 +5,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-// import { Router } from '@angular/router';
 import { EncodeBase64Directive } from '../../shared/directives/encode-base64.directive';
 import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
 import { emailsMatchValidator } from '../../shared/validators/email-check.validator';
@@ -15,11 +14,13 @@ import { Coordinates } from '../../shared/interfaces/coordinates';
 import { User } from '../../shared/interfaces/user';
 import { AuthService } from '../services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-// import { Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm-modal.component';
 
 @Component({
-  selector: 'register',
   standalone: true,
+  selector: 'register',
   imports: [
     FormsModule,
     EncodeBase64Directive,
@@ -30,11 +31,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './register.component.css',
 })
 export class RegisterComponent implements CanComponentDeactivate {
-  // #router = inject(Router);
   #fb = inject(NonNullableFormBuilder);
   #authService = inject(AuthService);
   coords = output<Coordinates>();
   #destroyRef = inject(DestroyRef);
+  #router = inject(Router);
+  #modal = inject(NgbModal);
 
   constructor() {
     GeolocationServicesService.getLocation().then(
@@ -89,16 +91,17 @@ export class RegisterComponent implements CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe(() => {
         this.#saved = true;
-        // this.#router.navigate(['login'])
+        this.#router.navigate(['login']);
       });
-      
-    }
+  }
 
   canDeactivate() {
-    return (
-      this.#saved ||
-      this.registerForm.pristine ||
-      confirm('¿Quieres abandonar la página?. Los cambios se perderán...')
-    );
+    if (this.#saved || this.registerForm.pristine) {
+      return true;
+    }
+    const modalRef = this.#modal.open(ConfirmModalComponent);
+    modalRef.componentInstance.title = 'Changes not saved';
+    modalRef.componentInstance.body = 'Do you want to leave the page?';
+    return modalRef.result.catch(() => false);
   }
 }

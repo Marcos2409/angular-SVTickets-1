@@ -9,6 +9,12 @@ export interface User {
     me?: boolean;
 }
 
+export interface GoogleFbLogin {
+    token: string,
+    lat: number,
+    lng: number
+}
+
 export interface UserLogin {
     email: string;
     password: string;

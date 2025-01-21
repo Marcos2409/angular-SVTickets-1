@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { EventFormComponent } from '../event-form/event-form.component';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+// import { EventFormComponent } from '../event-form/event-form.component';
 import { MyEvent } from '../../shared/interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
 import { FormsModule } from '@angular/forms';
@@ -7,16 +7,18 @@ import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'events-page',
   standalone: true,
-  imports: [EventFormComponent, EventCardComponent, FormsModule],
+  selector: 'events-page',
+  imports: [EventCardComponent, FormsModule],
   templateUrl: './events-page.component.html',
   styleUrl: './events-page.component.css',
 })
 export class EventsPageComponent {
-  events = signal<MyEvent[]>([]);
+  #destroyRef = inject(DestroyRef);
+  #eventsService = inject(EventsService);
 
-  search = signal('');
+  events = signal<MyEvent[]>([]);
+  search = signal<string>('');
 
   filteredEvents = computed(() => {
     const searchLower = this.search().toLowerCase();
@@ -27,13 +29,13 @@ export class EventsPageComponent {
     );
   });
 
-  #eventsService = inject(EventsService);
-
   constructor() {
+    console.log(this.#eventsService.getEvents());
+
     this.#eventsService
       .getEvents()
-      .pipe(takeUntilDestroyed())
-      .subscribe((events) => this.events.set(events));
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((res) => this.events.set(res.events));
   }
 
   addEvent(event: MyEvent) {

@@ -68,9 +68,14 @@
   </div>
 
   @if(imageBase64) {
-  <img [src]="imageBase64" alt="" class="img-thumbnail mb-3">
+  <img [src]="imageBase64" alt="" class="img-thumbnail mb-3 rounded mx-auto d-block max" style="max-width: 200px;">
   }
 
+  <ol-map [coordinates]="coordinates()">
+    <ga-autocomplete (locationChange)="changePlace($event)"></ga-autocomplete>
+    <ol-marker [coordinates]="coordinates()"></ol-marker>
+  </ol-map>
+  
   <div>
     <button type="submit" class="btn btn-primary" [disabled]="!eventForm.valid">Create</button>
   </div>

@@ -2,13 +2,13 @@ import { Routes } from '@angular/router';
 
 export const profileRoutes: Routes = [
   {
-    path: 'profile',
+    path: '',
     loadComponent: () =>
       import('./profile-page/profile-page.component').then((m) => m.ProfilePageComponent),
     title: 'Profile | SVTickets',
   },
   {
-    path: 'profile/:id',
+    path: '/:id',
     loadComponent: () =>
       import('./profile-page/profile-page.component').then((m) => m.ProfilePageComponent),
     title: 'Profile | SVTickets',
