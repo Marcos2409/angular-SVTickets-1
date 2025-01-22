@@ -8,7 +8,7 @@ export const profileRoutes: Routes = [
     title: 'Profile | SVTickets',
   },
   {
-    path: '/:id',
+    path: ':id',
     loadComponent: () =>
       import('./profile-page/profile-page.component').then((m) => m.ProfilePageComponent),
     title: 'Profile | SVTickets',

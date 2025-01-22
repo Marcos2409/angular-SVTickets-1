@@ -16,7 +16,7 @@ import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { GoogleLoginDirective } from '../../google-login/google-login.directive';
 import { GoogleFbLogin, UserLogin } from '../../shared/interfaces/user';
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -75,21 +75,19 @@ export class LoginComponent implements CanComponentDeactivate {
       });
   }
 
-  googleUserLogin(userData: GoogleFbLogin): Observable<void> {
-    return new Observable<void>((loginObs) => {
-      this.#authService
-        .googleFbLogin(userData)
-        .pipe(takeUntilDestroyed(this.#destroyRef))
-        .subscribe({
-          next: () => {
-            loginObs.next();
-            loginObs.complete();
-          },
-          error: (error) => {
-            loginObs.error(error);
-          },
-        });
-    });
+  googleUserLogin(resp: google.accounts.id.CredentialResponse): void {
+    const userData: GoogleFbLogin = {
+      token: resp.credential,
+      lat: 0,
+      lng: 0,
+    };
+
+    this.#authService
+      .googleFbLogin(userData)
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe(() => {
+        this.#router.navigate(['/events']);
+      });
   }
 
   loginForm = this.#fb.group({
@@ -98,16 +96,6 @@ export class LoginComponent implements CanComponentDeactivate {
     lat: [0],
     lng: [0],
   });
-
-  loggedGoogle(resp: google.accounts.id.CredentialResponse) {
-    const googleLoginData = {
-      token: resp.credential,
-      lat: 0,
-      lng: 0,
-    };
-
-    this.googleUserLogin(googleLoginData);
-  }
 
   canDeactivate() {
     if (this.#saved || this.loginForm.pristine) {

@@ -20,6 +20,16 @@ export const eventsRoutes: Routes = [
         (m) => m.EventFormComponent
       ),
     title: 'Añadir evento | SVTickets',
+  },{
+    path: ':id/edit',
+    canActivate: [numericIdGuard],
+    resolve: {
+      event: eventResolver,
+    },
+    loadComponent: () =>
+      import('./event-form/event-form.component').then(
+        (m) => m.EventFormComponent
+      ),
   },
   {
     path: ':id',

@@ -72,7 +72,7 @@
   }
 
   <ol-map [coordinates]="coordinates()">
-    <ga-autocomplete (locationChange)="changePlace($event)"></ga-autocomplete>
+    <ga-autocomplete (locationChange)="changePlace($event)" formControlName="address"></ga-autocomplete>
     <ol-marker [coordinates]="coordinates()"></ol-marker>
   </ol-map>
   

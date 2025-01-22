@@ -1,24 +1,87 @@
-import { Component, effect, inject, input } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { MyEvent } from '../../shared/interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
+import { OlMapDirective } from '../../shared/directives/ol-maps/ol-map.directive';
+import { OlMarkerDirective } from '../../shared/directives/ol-maps/ol-marker.directive';
+import { EventsService } from '../services/events.service';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { User } from '../../shared/interfaces/user';
+import { SingleCommentResponse } from '../../shared/interfaces/responses';
 
 @Component({
-  standalone: true,
+  standalone: true, 
   selector: 'event-detail',
-  imports: [EventCardComponent],
+  imports: [EventCardComponent, OlMapDirective, OlMarkerDirective, RouterLink, ReactiveFormsModule],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css',
 })
 export class EventDetailComponent {
-  #title = inject(Title);
   #router = inject(Router);
+  #eventService = inject(EventsService);
+  #fb = inject(NonNullableFormBuilder);
 
   event = input.required<MyEvent>();
+  coordinates = signal<[number, number]>([-0.5, 38.5]);
+  address = signal<string>('');
+  attendees = signal<User[]>([]);
+  comments = signal<SingleCommentResponse[]>([]);
+  attend = output<void>();
+
+  commentForm = this.#fb.group({
+    message: ['', Validators.required],
+  });
 
   constructor() {
-    effect(() => this.#title.setTitle(this.event().title + ' | SvTickets'));
+    effect(() => {
+      this.updateData();
+    });
+  }
+
+  updateData() {
+    if (this.event()) {
+      this.setAttendees(this.event().id);
+      this.setComments(this.event().id);
+    }
+  }
+
+  setAttendees(id: number) {
+    this.#eventService
+      .getAttendees(id)
+      .pipe()
+      .subscribe((result) => {
+        this.attendees.set(result.users);
+      });
+  }
+
+  setComments(id: number) {
+    this.#eventService
+      .getComments(id)
+      .pipe()
+      .subscribe((result) => {
+        this.comments.set(result.comments);
+      });
+  }
+
+  postComment(event: Event): void {
+    event.preventDefault();
+    const comment = this.commentForm.getRawValue();
+    const commentBody = comment.message;
+    this.#eventService
+      .postComment(this.event().id, commentBody)
+      .pipe()
+      .subscribe((response) => {
+        this.comments.update((comments) => [...comments, response]);
+      });
+
+    this.commentForm.reset();
   }
 
   goBack() {
@@ -26,25 +89,4 @@ export class EventDetailComponent {
   }
 }
 
-//TODO implement event map
-//TODO attending users list (updated when self attending toggles)
-//TODO implement comments viewing and form (POST /events/:id/comments, template in 1st project, format: { comment: "User comment" })
-
-//Possible comment form:
-// <form class="mt-4">
-//  <div class="form-group">
-//  <textarea class="form-control" name="comment" placeholder="Write a comment"></textarea>
-//  </div>
-//  <button type="submit" class="btn btn-primary mt-3">Send</button>
-//  </form>
-
-//Add this css to comments template
-// user-info {
-//   width: 8rem;
-//   .avatar {
-//   width: 4rem;
-//   }
-//  }
-//  .comment {
-//   white-space: pre-wrap;
-//  }
+//TODO revisar y optimizar lógica, mucho gpt

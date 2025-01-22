@@ -1,6 +1,105 @@
 <div class="mt-4">
-  <event-card [event]="event()" (deleted)="goBack()"></event-card>
+  <event-card
+    [event]="event()"
+    (deleted)="goBack()"
+    (attend)="updateData()"
+  ></event-card>
 </div>
+
+<div class="card mt-4">
+  <div class="card-header" id="address">{{ event().address }}</div>
+  <ol-map [coordinates]="coordinates()">
+    <ol-marker [coordinates]="[event().lat, event().lng]"></ol-marker>
+  </ol-map>
+</div>
+
+@if(attendees()) {
+<div class="card mt-4 mb-4">
+  <div class="card-header bg-success text-white" id="address">
+    Attendees to the event
+  </div>
+  <ul class="list-group" id="userList">
+    @for (user of attendees(); track user.id) {
+    <li class="list-group-item">
+      <a class="avatar" [routerLink]="['/profile', user.id]">
+        <img
+          class="rounded-circle float-start me-3"
+          src="{{ user.avatar }}"
+          alt=""
+        />
+      </a>
+      <div>
+        <div>
+          <a
+            class="text-decoration-none name"
+            [routerLink]="['/profile', user.id]"
+            >{{ user.name }}</a
+          >
+        </div>
+        <div>
+          <small class="email">{{ user.email }}</small>
+        </div>
+      </div>
+    </li>
+    }
+  </ul>
+</div>
+
+} 
+
+@if(event().attend) {
+  <form class="mt-4" [formGroup]="commentForm" (submit)="postComment($event)">
+    <div class="form-group">
+      <textarea
+        class="form-control"
+        formControlName="message"
+        name="comment"
+        placeholder="Write a comment"
+      ></textarea>
+    </div>
+    <button 
+      type="submit" 
+      class="btn btn-primary mt-3" 
+      [disabled]="commentForm.invalid"
+    >
+      Send
+    </button>
+  </form>
+  }
+  
+
+@if (comments()) {
+<div class="card mt-4 mb-4">
+  <div class="card-header bg-info text-white" id="address">User comments</div>
+  <ul class="list-group" id="userComments">
+    @for (comment of comments(); track comment.id) {
+    <li class="list-group-item">
+      <a class="avatar" [routerLink]="['/profile', comment.user.id]">
+        <img
+          class="rounded-circle float-start me-3"
+          src="{{ comment.user.avatar }}"
+          alt=""
+        />
+      </a>
+      <div>
+        <div>
+          <a
+            class="text-decoration-none name"
+            [routerLink]="['/profile', comment.user.id]"
+            >{{ comment.user.name }}</a
+          >
+        </div>
+        <div>
+          <small class="email">{{ comment.user.email }}</small>
+        </div>
+      </div>
+      {{ comment.comment }}
+    </li>
+    }
+  </ul>
+</div>
+}
+
 <div class="mt-4 mb-4">
   <button class="btn btn-success" (click)="goBack()">Go back</button>
 </div>

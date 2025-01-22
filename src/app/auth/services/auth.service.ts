@@ -66,7 +66,7 @@ export class AuthService {
   register(data: User): Observable<void> {
     return this.#http.post<void>('auth/register', data).pipe(
       map(() => {
-        console.log('User succesfully registered');
+        alert('User succesfully registered');
       }),
       catchError((error) => {
         const errorMessage = Array.isArray(error.error)

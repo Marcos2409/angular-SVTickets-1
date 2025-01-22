@@ -1,27 +1,107 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-// import { EventFormComponent } from '../event-form/event-form.component';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { MyEvent } from '../../shared/interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsService } from '../services/events.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'events-page',
-  imports: [EventCardComponent, FormsModule],
+  imports: [EventCardComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './events-page.component.html',
-  styleUrl: './events-page.component.css',
+  styleUrls: ['./events-page.component.css'],
 })
 export class EventsPageComponent {
   #destroyRef = inject(DestroyRef);
   #eventsService = inject(EventsService);
 
   events = signal<MyEvent[]>([]);
-  search = signal<string>('');
+  currentPage = signal<number>(1);
+  eventsLeft = signal<boolean>(false);
+  order = signal<string>('distance');
+
+  searchControl = new FormControl('');
+  search = toSignal(
+    this.searchControl.valueChanges.pipe(
+      debounceTime(600),
+      distinctUntilChanged()
+    ),
+    { initialValue: '' }
+  );
+
+  filterDescription = computed(() => {
+    const searchTerm = this.search()?.trim();
+    const orderBy = this.order();
+    const filters = [];
+    if (searchTerm) {
+      filters.push(`searching for "${searchTerm}"`);
+    }
+    if (orderBy) {
+      filters.push(`ordered by ${orderBy}`);
+    }
+    return filters.length > 0
+      ? `Current filters: ${filters.join(', ')}`
+      : 'No current filters.';
+  });
+
+  constructor() {
+    effect(() => {
+      this.loadEvents();
+    });
+  }
+
+  loadEvents() {
+    this.#eventsService
+      .getEvents(this.currentPage(), this.search()!, this.order())
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((res) => {
+        const uniqueEvents = [
+          ...new Map(
+            [...this.events(), ...res.events].map((e) => [e.id, e])
+          ).values(),
+        ];
+        this.events.set(uniqueEvents);
+        this.eventsLeft.set(res.more);
+      });
+  }
+
+  loadMore() {
+    this.currentPage.update((page) => page + 1);
+    this.loadEvents();
+  }
+
+  orderDate() {
+    this.order.set('date');
+    this.resetPagination();
+  }
+
+  orderPrice() {
+    this.order.set('price');
+    this.resetPagination();
+  }
+
+  orderDistance() {
+    this.order.set('distance');
+    this.resetPagination();
+  }
+
+  resetPagination() {
+    this.currentPage.set(1);
+    this.events.set([]);
+    this.loadEvents();
+  }
 
   filteredEvents = computed(() => {
-    const searchLower = this.search().toLowerCase();
+    const searchLower = this.search()!.toLowerCase();
     return this.events().filter(
       (e) =>
         e.title.toLowerCase().includes(searchLower) ||
@@ -29,33 +109,12 @@ export class EventsPageComponent {
     );
   });
 
-  constructor() {
-    console.log(this.#eventsService.getEvents());
-
-    this.#eventsService
-      .getEvents()
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((res) => this.events.set(res.events));
-  }
-
   addEvent(event: MyEvent) {
     this.events.update((events) => [...events, event]);
   }
 
   deleteEvent(event: MyEvent) {
     this.events.update((events) => events.filter((e) => e !== event));
-  }
-
-  orderDate() {
-    this.events.update((events) =>
-      events.toSorted((e1, e2) => e1.date.localeCompare(e2.date))
-    );
-  }
-
-  orderPrice() {
-    this.events.update((events) =>
-      events.toSorted((e1, e2) => e1.price - e2.price)
-    );
   }
 }
 

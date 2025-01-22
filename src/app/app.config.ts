@@ -15,6 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withInterceptors([baseUrlInterceptor, authInterceptor])),
-    provideGoogleId('946951907249-sc9racsmrpdr62sgd9oudu5gm8582soj.apps.googleusercontent.com'),
+    provideGoogleId('746820501392-oalflicqch2kuc12s8rclb5rf7b1fist.apps.googleusercontent.com'),
   ],
 };

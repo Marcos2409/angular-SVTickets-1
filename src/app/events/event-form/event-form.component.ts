@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -30,13 +30,27 @@ import { GaAutocompleteDirective } from '../../shared/directives/ol-maps/ga-auto
     ValidationClassesDirective,
     OlMapDirective,
     OlMarkerDirective,
-    GaAutocompleteDirective
+    GaAutocompleteDirective,
   ],
   providers: [DatePipe],
   templateUrl: './event-form.component.html',
   styleUrl: './event-form.component.css',
 })
 export class EventFormComponent implements CanComponentDeactivate {
+
+  constructor() {
+    effect(() => {
+      if (this.event()) {
+        this.eventForm.get('title')?.setValue(this.event().title);
+        this.eventForm.get('date')?.setValue(this.event().date.split(' ')[0]);
+        this.eventForm.get('description')?.setValue(this.event().description);
+        this.eventForm.get('price')?.setValue(this.event().price);
+        this.imageBase64 = this.event().image;
+        this.coordinates.set([this.event().lat, this.event().lng]);
+      }
+    });
+  }
+  
   added = output<MyEvent>();
   #eventsService = inject(EventsService);
   #router = inject(Router);
@@ -45,15 +59,12 @@ export class EventFormComponent implements CanComponentDeactivate {
   #destroyRef = inject(DestroyRef);
   #modal = inject(NgbModal);
 
-  //OL map implementation
   coordinates = signal<[number, number]>([-0.5, 38.5]);
-  address = signal<string>("");
+  event = input.required<MyEvent>();
 
   changePlace(result: SearchResult) {
     this.coordinates.set(result.coordinates);
-    this.address.set(result.address);
-    console.log(this.address());
-    console.log(this.coordinates());
+    this.eventForm.get('address')?.setValue(result.address);
   }
 
   eventForm = this.#fb.group({
@@ -69,6 +80,7 @@ export class EventFormComponent implements CanComponentDeactivate {
     description: ['', [Validators.required]],
     price: [0, [Validators.required, Validators.min(1)]],
     image: ['', [Validators.required]],
+    address: ['', [Validators.required]],
   });
 
   imageBase64 = '';
@@ -80,18 +92,26 @@ export class EventFormComponent implements CanComponentDeactivate {
       image: this.imageBase64,
       lat: this.coordinates()[0],
       lng: this.coordinates()[1],
-      address: this.address(),
     };
-  
-    this.#eventsService
-      .addEvent(newEvent as MyEvent)
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe(() => {
-        this.saved = true;
-        this.#router.navigate(['/events']);
-      });
+
+    if (!this.event()) {
+      this.#eventsService
+        .addEvent(newEvent)
+        .pipe(takeUntilDestroyed(this.#destroyRef))
+        .subscribe(() => {
+          this.saved = true;
+          this.#router.navigate(['/events']);
+        });
+    } else {
+      this.#eventsService
+        .updateEvent(newEvent, this.event().id)
+        .pipe(takeUntilDestroyed(this.#destroyRef))
+        .subscribe(() => {
+          this.saved = true;
+          this.#router.navigate(['/events']);
+        });
+    }
   }
-  
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;

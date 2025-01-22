@@ -26,7 +26,7 @@ export class GaAutocompleteDirective {
       this.#autoComplete = new GeocoderAutocomplete(
         this.#elementRef.nativeElement,
         "42c7710f83bc41698b841fec7a3b5d2d",
-        { lang: "es" , debounceDelay: 400}
+        { lang: "es" , debounceDelay: 600}
       );
 
       this.#autoComplete.on("select", (location) => {

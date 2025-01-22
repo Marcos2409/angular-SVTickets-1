@@ -1,1 +1,4 @@
-
+.filter-text {
+  display: flex;
+  margin-left: 2em;
+}

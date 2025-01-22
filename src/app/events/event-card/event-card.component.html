@@ -11,11 +11,16 @@
       <div class="row">
         @if (event().mine) {
         <div class="col">
-          <button class="btn btn-danger delete" (confirm)="deleteEvent()">
+          <button (click)="deleteEvent()" class="btn btn-danger delete">
             <i class="bi bi-trash"></i>
           </button>
+          <a [routerLink]="['/events', event().id, 'edit']"
+            ><button class="btn btn-success edit">
+              <i class="bi bi-pencil-fill"></i></button
+          ></a>
         </div>
         }
+
         <div class="col-auto ms-auto">
           <div class="text-end attend-users">
             <i class="bi bi-people-fill"></i> {{ event().numAttend }}
@@ -23,13 +28,20 @@
           <div
             class="text-success text-end m-0 attend-button"
             [class]="{
-              'bi-hand-thumbs-up-fill': event().attend,
-              'bi-hand-thumbs-down-fill': !event().attend
+              'text-success': event().attend,
+              'text-danger': !event().attend
             }"
-            (click)="attendEvent()"
+            (click)="toggleAttend()"
             tabindex="0"
-            (keydown.enter)="attendEvent()"
+            (keydown.enter)="toggleAttend()"
           >
+            <i
+              class="bi"
+              [class]="{
+                'bi-hand-thumbs-up-fill': event().attend,
+                'bi-hand-thumbs-down-fill': !event().attend
+              }"
+            ></i>
             {{ event().attend ? "Im going" : "Not going" }}
           </div>
         </div>
@@ -57,7 +69,7 @@
         <div class="price small">
           {{ event().price | intlCurrency : "EUR" : "es-ES" }}
         </div>
-        <div class="distance small">{{ event().distance }}</div>
+        <div class="distance small">{{ event().distance }} Km</div>
       </div>
     </div>
   </div>
