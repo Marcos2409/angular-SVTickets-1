@@ -26,15 +26,26 @@ export class EventsService {
   getEvents(
     page: number,
     search: string,
-    order: string
+    order: string,
+    creator?: number,
+    attending?: number
   ): Observable<EventsResponse> {
-    const searchParams: URLSearchParams = new URLSearchParams({
+    const searchParams = new URLSearchParams({
       search,
       page: String(page),
       order,
     });
+  
+    if (creator) {
+      searchParams.append('creator', creator.toString());
+    }
+    if (attending) {
+      searchParams.append('attending', attending.toString());
+    }
+  
     return this.#http.get<EventsResponse>(`events?${searchParams.toString()}`);
   }
+  
 
   getEvent(id: number): Observable<MyEvent> {
     return this.#http
@@ -74,13 +85,12 @@ export class EventsService {
     return this.#http.get<CommentsResponse>(`events/${id}/comments`);
   }
 
-  postComment(id: number, commentBody: string): Observable<SingleCommentResponse> {
-    return this.#http.post<SingleCommentResponse>(
-      `events/${id}/comments`,
-      {
-        comment: commentBody,
-      }
-    );
+  postComment(
+    id: number,
+    commentBody: string
+  ): Observable<SingleCommentResponse> {
+    return this.#http.post<SingleCommentResponse>(`events/${id}/comments`, {
+      comment: commentBody,
+    });
   }
-  
 }

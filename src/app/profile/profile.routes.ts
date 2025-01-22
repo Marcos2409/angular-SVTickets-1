@@ -1,16 +1,27 @@
 import { Routes } from '@angular/router';
+import { profileResolver } from './resolvers/profile.resolver';
 
 export const profileRoutes: Routes = [
   {
     path: '',
+    resolve: {
+      user: profileResolver,
+    },
     loadComponent: () =>
-      import('./profile-page/profile-page.component').then((m) => m.ProfilePageComponent),
+      import('./profile-page/profile-page.component').then(
+        (m) => m.ProfilePageComponent
+      ),
     title: 'Profile | SVTickets',
   },
   {
     path: ':id',
+    resolve: {
+      user: profileResolver,
+    },
     loadComponent: () =>
-      import('./profile-page/profile-page.component').then((m) => m.ProfilePageComponent),
+      import('./profile-page/profile-page.component').then(
+        (m) => m.ProfilePageComponent
+      ),
     title: 'Profile | SVTickets',
   },
 ];

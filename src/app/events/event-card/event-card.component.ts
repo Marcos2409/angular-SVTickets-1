@@ -32,6 +32,13 @@ export class EventCardComponent {
       });
   }
 
+  handleImageError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    target.src = 'badImageAlt.png'; 
+  }
+  
+  
+
   toggleAttend() {
     if (this.event().attend) {
       this.#eventsService

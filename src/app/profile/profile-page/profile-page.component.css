@@ -1,0 +1,26 @@
+.card.mt-4 {
+  padding: 0;
+  width: fit-content;
+}
+
+button{
+  margin-right: 1em;
+}
+
+ol-map {
+  width: 400px;
+}
+
+#profile div:has(#avatar) {
+  position: relative;
+  & > label {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+  }
+}
+
+/* img{
+    border: solid lightblue 3px;
+    border-radius: 0.3em;
+} */

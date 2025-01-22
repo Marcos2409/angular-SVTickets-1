@@ -12,14 +12,24 @@ import { EventCardComponent } from '../event-card/event-card.component';
 import { OlMapDirective } from '../../shared/directives/ol-maps/ol-map.directive';
 import { OlMarkerDirective } from '../../shared/directives/ol-maps/ol-marker.directive';
 import { EventsService } from '../services/events.service';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { User } from '../../shared/interfaces/user';
 import { SingleCommentResponse } from '../../shared/interfaces/responses';
 
 @Component({
-  standalone: true, 
+  standalone: true,
   selector: 'event-detail',
-  imports: [EventCardComponent, OlMapDirective, OlMarkerDirective, RouterLink, ReactiveFormsModule],
+  imports: [
+    EventCardComponent,
+    OlMapDirective,
+    OlMarkerDirective,
+    RouterLink,
+    ReactiveFormsModule,
+  ],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css',
 })
@@ -49,6 +59,8 @@ export class EventDetailComponent {
     if (this.event()) {
       this.setAttendees(this.event().id);
       this.setComments(this.event().id);
+      this.coordinates.set([this.event().lat, this.event().lng]);
+      this.address.set(this.event().address);
     }
   }
 

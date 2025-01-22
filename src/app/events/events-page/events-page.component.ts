@@ -4,6 +4,7 @@ import {
   DestroyRef,
   effect,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { MyEvent } from '../../shared/interfaces/my-event';
@@ -12,6 +13,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { ProfileService } from '../../profile/services/profile.service';
 
 @Component({
   standalone: true,
@@ -23,11 +25,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 export class EventsPageComponent {
   #destroyRef = inject(DestroyRef);
   #eventsService = inject(EventsService);
+  #profileService = inject(ProfileService);
 
   events = signal<MyEvent[]>([]);
   currentPage = signal<number>(1);
   eventsLeft = signal<boolean>(false);
   order = signal<string>('distance');
+  creator = input<number>();
+  attending = input<number>();
 
   searchControl = new FormControl('');
   search = toSignal(
@@ -41,27 +46,50 @@ export class EventsPageComponent {
   filterDescription = computed(() => {
     const searchTerm = this.search()?.trim();
     const orderBy = this.order();
+    const creatorId = this.creator();
+    const attendingId = this.attending();
     const filters = [];
+
+    if (creatorId) {
+      this.#profileService.getProfile(creatorId).subscribe((user) => {
+        const creatorName = user.name;
+        console.log(creatorName)
+        filters.push(`Events created by ${creatorName}`);
+      });
+    }
+
+    if (attendingId) {
+      this.#profileService.getProfile(attendingId).subscribe((user) => {
+        const attendingName = user.name;
+        filters.push(`Events attending by ${attendingName}`);
+      });
+    }
+
     if (searchTerm) {
-      filters.push(`searching for "${searchTerm}"`);
+      filters.push(`Filtered by "${searchTerm}"`);
     }
     if (orderBy) {
-      filters.push(`ordered by ${orderBy}`);
+      filters.push(`Ordered by ${orderBy}`);
     }
-    return filters.length > 0
-      ? `Current filters: ${filters.join(', ')}`
-      : 'No current filters.';
+
+    return filters.length > 0 ? filters.join('. ') : 'No current filters.';
   });
 
   constructor() {
     effect(() => {
-      this.loadEvents();
+      this.loadEvents(this.creator(), this.attending());
     });
   }
 
-  loadEvents() {
+  loadEvents(creator?: number, attending?: number) {
     this.#eventsService
-      .getEvents(this.currentPage(), this.search()!, this.order())
+      .getEvents(
+        this.currentPage(),
+        this.search()!,
+        this.order(),
+        creator,
+        attending
+      )
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((res) => {
         const uniqueEvents = [
@@ -117,7 +145,3 @@ export class EventsPageComponent {
     this.events.update((events) => events.filter((e) => e !== event));
   }
 }
-
-//TODO attend button & functionality
-//TODO when event is mine: delete and edit
-//TODO event filtering, showing filters to the user as text

@@ -29,38 +29,27 @@ import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
-
 export class RegisterComponent implements CanComponentDeactivate {
   #fb = inject(NonNullableFormBuilder);
   #authService = inject(AuthService);
   #destroyRef = inject(DestroyRef);
   #router = inject(Router);
   #modal = inject(NgbModal);
-
-  registerForm = this.#fb.group({
-    name: ['', [Validators.required]],
-    emailGroup: this.#fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      email2: ['', [Validators.required, Validators.email]],
-    }, { validators: matchEmail }),
-    password: ['', [Validators.required, Validators.minLength(4)]],
-    lat: [0],
-    lng: [0],
-    avatar: ['', [Validators.required]],
-  });
-
+  #saved = false;
   imageBase64 = '';
 
-  newUser: User = {
-    name: '',
-    email: '',
-    password: '',
-    avatar: '',
-    lat: 0,
-    lng: 0,
-  };
-
-  private saved = false;
+  registerForm = this.#fb.group(
+    {
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      email2: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(4)]],
+      lat: [0],
+      lng: [0],
+      avatar: ['', [Validators.required]],
+    },
+    { validators: matchEmail }
+  );
 
   constructor() {
     GeolocationServicesService.getLocation().then(
@@ -81,9 +70,9 @@ export class RegisterComponent implements CanComponentDeactivate {
 
     const user: User = {
       name: rawValue.name,
-      email: rawValue.emailGroup.email,
+      email: rawValue.email,
       password: rawValue.password,
-      avatar: rawValue.avatar,
+      avatar: this.imageBase64,
       lat: rawValue.lat || 0,
       lng: rawValue.lng || 0,
     };
@@ -92,28 +81,22 @@ export class RegisterComponent implements CanComponentDeactivate {
       .register(user)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe(() => {
-        this.saved = true;
+        this.#saved = true;
         this.#router.navigate(['login']);
       });
   }
 
-  handleAvatarChange(event: Event) {
-    const file = (event.target as HTMLInputElement)?.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.getElementById('imgPreview') as HTMLImageElement;
-        if (img) {
-          img.src = e.target?.result as string;
-          img.classList.remove('d-none');
-        }
-      };
-      reader.readAsDataURL(file);
+  handleAvatarChange(base64Image: string) {
+    this.imageBase64 = base64Image;
+    const img = document.getElementById('imgPreview') as HTMLImageElement;
+    if (img) {
+      img.src = base64Image;
+      img.classList.remove('d-none');
     }
   }
 
   canDeactivate() {
-    if (this.saved || this.registerForm.pristine) {
+    if (this.#saved || this.registerForm.pristine) {
       return true;
     }
     const modalRef = this.#modal.open(ConfirmModalComponent);
