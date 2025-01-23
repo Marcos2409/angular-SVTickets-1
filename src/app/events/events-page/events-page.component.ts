@@ -53,7 +53,7 @@ export class EventsPageComponent {
     if (creatorId) {
       this.#profileService.getProfile(creatorId).subscribe((user) => {
         const creatorName = user.name;
-        console.log(creatorName)
+        console.log(creatorName);
         filters.push(`Events created by ${creatorName}`);
       });
     }

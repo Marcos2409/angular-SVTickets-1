@@ -14,9 +14,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
 import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { GoogleLoginDirective } from '../../google-login/google-login.directive';
+import { GoogleLoginDirective } from '../google-login/google-login.directive';
 import { GoogleFbLogin, UserLogin } from '../../shared/interfaces/user';
 import { map } from 'rxjs';
+import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { FbLoginDirective } from '../facebook-login/fb-login.directive';
 
 @Component({
   standalone: true,
@@ -26,6 +28,7 @@ import { map } from 'rxjs';
     ReactiveFormsModule,
     ValidationClassesDirective,
     GoogleLoginDirective,
+    FbLoginDirective,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -38,6 +41,7 @@ export class LoginComponent implements CanComponentDeactivate {
   #destroyRef = inject(DestroyRef);
   #saved = false;
   #modal = inject(NgbModal);
+  iconFacebook = faFacebook;
 
   constructor() {
     GeolocationServicesService.getLocation().then(
@@ -52,6 +56,11 @@ export class LoginComponent implements CanComponentDeactivate {
       }
     );
   }
+
+  showError(error: string) {
+    console.error(error);
+  }
+
 
   login(): void {
     const user: UserLogin = {
@@ -84,6 +93,21 @@ export class LoginComponent implements CanComponentDeactivate {
 
     this.#authService
       .googleFbLogin(userData)
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe(() => {
+        this.#router.navigate(['/events']);
+      });
+  }
+
+  fbUserLogin(resp: fb.StatusResponse): void {
+    const userData: GoogleFbLogin = {
+      token: resp.authResponse.accessToken!,
+      lat: 0,
+      lng: 0,
+    };
+
+    this.#authService
+      .fbLogin(userData)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe(() => {
         this.#router.navigate(['/events']);

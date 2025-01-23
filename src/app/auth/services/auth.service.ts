@@ -47,6 +47,21 @@ export class AuthService {
       })
     );
   }
+  
+  fbLogin(data: GoogleFbLogin): Observable<void> {
+    return this.#http.post<TokenResponse>(`auth/facebook`, data).pipe(
+      map((response: TokenResponse) => {
+        this.#logged.set(true);
+        localStorage.setItem('authToken', response.accessToken);
+      }),
+      catchError((error) => {
+        const errorMessage = Array.isArray(error.error);
+        alert(errorMessage);
+
+        return of();
+      })
+    );
+  }
 
   logout(): void {
     this.#logged.set(false);

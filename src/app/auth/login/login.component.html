@@ -39,7 +39,15 @@
 
   <p class="text-danger"></p>
   <button type="submit" class="btn btn-primary">Login</button>
-  <div>
-    <google-login class="btn" (login)="googleUserLogin($event)"></google-login>
-  </div>
+
 </form>
+
+<div>
+  <google-login class="btn" (login)="googleUserLogin($event)"></google-login>
+</div>
+
+<button fbLogin [scopes]="['email', 'public_profile']" class="btn btn-primary" (loginOk)="fbUserLogin($event)"
+  (loginError)="showError($event)">
+  <!-- <fa-icon [icon]="iconFacebook"></fa-icon> -->
+  Login con Facebook
+</button>
