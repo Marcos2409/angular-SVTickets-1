@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, output } from '@angular/core';
+import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 import {
   FormsModule,
   NonNullableFormBuilder,
@@ -42,6 +42,7 @@ export class LoginComponent implements CanComponentDeactivate {
   #saved = false;
   #modal = inject(NgbModal);
   iconFacebook = faFacebook;
+  errors = signal<number>(0);
 
   constructor() {
     GeolocationServicesService.getLocation().then(
@@ -79,7 +80,7 @@ export class LoginComponent implements CanComponentDeactivate {
       )
       .subscribe({
         error: (error) => {
-          console.error('Login error: ', error);
+          this.errors.set(error.status);
         },
       });
   }

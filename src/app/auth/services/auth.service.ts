@@ -23,12 +23,6 @@ export class AuthService {
       map((response: TokenResponse) => {
         this.#logged.set(true);
         localStorage.setItem('authToken', response.accessToken);
-      }),
-      catchError((error) => {
-        const errorMessage = Array.isArray(error.error);
-        alert(errorMessage);
-
-        return of();
       })
     );
   }
@@ -82,14 +76,6 @@ export class AuthService {
     return this.#http.post<void>('auth/register', data).pipe(
       map(() => {
         alert('User succesfully registered');
-      }),
-      catchError((error) => {
-        const errorMessage = Array.isArray(error.error)
-          ? error.error.join('\n')
-          : error.error?.message || 'An unknown error occurred.';
-        alert(errorMessage);
-
-        return of();
       })
     );
   }

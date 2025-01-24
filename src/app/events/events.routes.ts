@@ -11,6 +11,7 @@ export const eventsRoutes: Routes = [
         (m) => m.EventsPageComponent
       ),
     title: 'Eventos | SVTickets',
+    data: { animation: 'eventsPage' }
   },
   {
     path: 'add',
@@ -20,6 +21,7 @@ export const eventsRoutes: Routes = [
         (m) => m.EventFormComponent
       ),
     title: 'Añadir evento | SVTickets',
+    data: { animation: 'eventForm' }
   },{
     path: ':id/edit',
     canActivate: [numericIdGuard],
@@ -30,6 +32,7 @@ export const eventsRoutes: Routes = [
       import('./event-form/event-form.component').then(
         (m) => m.EventFormComponent
       ),
+      data: { animation: 'eventEdit' }
   },
   {
     path: ':id',
@@ -42,5 +45,6 @@ export const eventsRoutes: Routes = [
       import('./event-detail/event-detail.component').then(
         (m) => m.EventDetailComponent
       ),
+      data: { animation: 'eventDetail' }
   },
 ];

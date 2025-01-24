@@ -61,10 +61,12 @@ export class EventFormComponent implements CanComponentDeactivate {
 
   coordinates = signal<[number, number]>([-0.5, 38.5]);
   event = input.required<MyEvent>();
+  address = "";
 
   changePlace(result: SearchResult) {
     this.coordinates.set(result.coordinates);
-    this.eventForm.get('address')?.setValue(result.address);
+    // this.eventForm.get('address')?.setValue(result.address);
+    this.address = result.address;
   }
 
   eventForm = this.#fb.group({
@@ -92,6 +94,7 @@ export class EventFormComponent implements CanComponentDeactivate {
       image: this.imageBase64,
       lat: this.coordinates()[0],
       lng: this.coordinates()[1],
+      address: this.address
     };
 
     if (!this.event()) {

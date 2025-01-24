@@ -1,3 +1,11 @@
+@if(errors() === 401) {
+  <div class="alert alert-danger">An user with that email + password doesn't exist!</div>
+}
+
+@if(errors() === 400) {
+  <div class="alert alert-danger">Wrong email!</div>
+}
+
 <form action="#" class="mt-4" role="form" method="POST" [formGroup]="loginForm" (ngSubmit)="login()">
   <legend>Welcome to SVTickets!</legend>
 
@@ -38,16 +46,15 @@
   </div>
 
   <p class="text-danger"></p>
-  <button type="submit" class="btn btn-primary">Login</button>
+  <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
 
 </form>
 
-<div>
+<div style="margin-left: -0.7em;">
   <google-login class="btn" (login)="googleUserLogin($event)"></google-login>
 </div>
 
 <button fbLogin [scopes]="['email', 'public_profile']" class="btn btn-primary" (loginOk)="fbUserLogin($event)"
   (loginError)="showError($event)">
-  <!-- <fa-icon [icon]="iconFacebook"></fa-icon> -->
-  Login con Facebook
+  <i class="bi bi-facebook"></i> Login con Facebook
 </button>

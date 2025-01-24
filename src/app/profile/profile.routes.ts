@@ -12,6 +12,7 @@ export const profileRoutes: Routes = [
         (m) => m.ProfilePageComponent
       ),
     title: 'Profile | SVTickets',
+    data: { animation: 'profilePage' }
   },
   {
     path: ':id',
@@ -23,5 +24,6 @@ export const profileRoutes: Routes = [
         (m) => m.ProfilePageComponent
       ),
     title: 'Profile | SVTickets',
+    data: { animation: 'profilePage' }
   },
 ];

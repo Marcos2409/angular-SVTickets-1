@@ -5,6 +5,8 @@ import { IntlCurrencyPipe } from '../../shared/pipes/intl-currency.pipe';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm-modal.component';
 
 @Component({
   standalone: true,
@@ -17,27 +19,41 @@ export class EventCardComponent {
   #eventsService = inject(EventsService);
   #destroyRef = inject(DestroyRef);
   #router = inject(Router);
+  #modal = inject(NgbModal);
 
   event = input.required<MyEvent>();
   deleted = output<number>();
   attend = output<void>();
 
   deleteEvent() {
-    this.#eventsService
-      .deleteEvent(this.event().id!)
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe(() => {
-        this.deleted.emit(this.event().id!);
-        this.#router.navigate(['/events']);
+    const modalRef = this.#modal.open(ConfirmModalComponent);
+    modalRef.componentInstance.title = 'Are you sure?';
+    modalRef.componentInstance.body = 'Do you want to delete this event?';
+  
+    modalRef.result
+      .then((result) => {
+        if (result) {
+          this.#eventsService
+            .deleteEvent(this.event().id!)
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+              this.deleted.emit(this.event().id!);
+              this.#router.navigate(['/events']);
+            });
+        } else {
+          console.log('Event deletion canceled');
+        }
+      })
+      .catch(() => {
+        console.log('Event deletion canceled');
       });
   }
+  
 
   handleImageError(event: Event) {
     const target = event.target as HTMLImageElement;
-    target.src = 'badImageAlt.png'; 
+    target.src = 'badImageAlt.png';
   }
-  
-  
 
   toggleAttend() {
     if (this.event().attend) {

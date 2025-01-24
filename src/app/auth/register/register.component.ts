@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormsModule,
   NonNullableFormBuilder,
@@ -37,6 +37,8 @@ export class RegisterComponent implements CanComponentDeactivate {
   #modal = inject(NgbModal);
   #saved = false;
   imageBase64 = '';
+
+  errors = signal<number>(0);
 
   registerForm = this.#fb.group(
     {
@@ -80,9 +82,16 @@ export class RegisterComponent implements CanComponentDeactivate {
     this.#authService
       .register(user)
       .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe(() => {
-        this.#saved = true;
-        this.#router.navigate(['login']);
+      .subscribe({
+        next: () => {
+          this.#saved = true;
+          this.#router.navigate(['login']);
+        },
+        error: (error) => {
+          this.errors.set(error.status);
+          window.scrollTo(0, 0);
+        }
+
       });
   }
 

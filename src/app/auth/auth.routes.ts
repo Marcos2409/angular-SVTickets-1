@@ -8,6 +8,7 @@ export const authRoutes: Routes = [
       import('./login/login.component').then((m) => m.LoginComponent),
     title: 'Login | SVTickets',
     canDeactivate: [leavePageGuard],
+    data: { animation: 'loginPage' }
   },
   {
     path: 'register',
@@ -15,5 +16,6 @@ export const authRoutes: Routes = [
       import('./register/register.component').then((m) => m.RegisterComponent),
     title: 'Register | SVTickets',
     canDeactivate: [leavePageGuard],
+    data: { animation: 'registerPage' }
   },
 ];
