@@ -43,14 +43,14 @@ export class EventCardComponent {
     if (this.event().attend) {
       this.#eventsService
         .deleteAttendee(this.event().id)
-        .pipe()
+        .pipe(takeUntilDestroyed(this.#destroyRef))
         .subscribe(() => this.attend.emit());
       this.event().attend = false;
       this.event().numAttend--;
     } else {
       this.#eventsService
         .postAttendee(this.event().id)
-        .pipe()
+        .pipe(takeUntilDestroyed(this.#destroyRef))
         .subscribe(() => this.attend.emit());
       this.event().attend = true;
       this.event().numAttend++;

@@ -43,41 +43,47 @@ export class EventsPageComponent {
     { initialValue: '' }
   );
 
-  filterDescription = computed(() => {
-    const searchTerm = this.search()?.trim();
-    const orderBy = this.order();
-    const creatorId = this.creator();
-    const attendingId = this.attending();
-    const filters = [];
-
-    if (creatorId) {
-      this.#profileService.getProfile(creatorId).subscribe((user) => {
-        const creatorName = user.name;
-        console.log(creatorName);
-        filters.push(`Events created by ${creatorName}`);
-      });
-    }
-
-    if (attendingId) {
-      this.#profileService.getProfile(attendingId).subscribe((user) => {
-        const attendingName = user.name;
-        filters.push(`Events attending by ${attendingName}`);
-      });
-    }
-
-    if (searchTerm) {
-      filters.push(`Filtered by "${searchTerm}"`);
-    }
-    if (orderBy) {
-      filters.push(`Ordered by ${orderBy}`);
-    }
-
-    return filters.length > 0 ? filters.join('. ') : 'No current filters.';
-  });
+  filterDescription = signal<string>('');
 
   constructor() {
     effect(() => {
       this.loadEvents(this.creator(), this.attending());
+    });
+
+    effect(() => {
+      const searchTerm = this.search()?.trim();
+      const orderBy = this.order();
+      const creatorId = this.creator();
+      const attendingId = this.attending();
+      const filters: string[] = [];
+
+      if (creatorId) {
+        this.#profileService.getProfile(creatorId).subscribe((user) => {
+          const creatorName = user.name;
+          filters.push(`Events created by ${creatorName}`);
+          this.filterDescription.set(filters.join('. '));
+        });
+      }
+
+      if (attendingId) {
+        this.#profileService.getProfile(attendingId).subscribe((user) => {
+          const attendingName = user.name;
+          filters.push(`Events ${attendingName} is attending`);
+          this.filterDescription.set(filters.join('. '));
+        });
+      }
+
+      if (searchTerm) {
+        filters.push(`Filtered by "${searchTerm}"`);
+      }
+
+      if (orderBy) {
+        filters.push(`Ordered by ${orderBy}`);
+      }
+
+      this.filterDescription.set(
+        filters.length > 0 ? filters.join('. ') : 'No current filters.'
+      );
     });
   }
 

@@ -46,26 +46,30 @@
         <i class="fa-solid fa-lock"></i>
         Edit password
       </button>
-      @if(user().me) {
-      <div class="mt-3">
-        <a
-          class="btn btn-info"
-          [routerLink]="['/events']"
-          [queryParams]="{ creator: user().id }"
-        >
-          Events created by {{ user().name }}
-        </a>
-        <a
-          class="btn btn-secondary"
-          [routerLink]="['/events']"
-          [queryParams]="{ attending: user().id }"
-        >
-          Events {{ user().name }} is attending
-        </a>
-      </div>
-      }
     </div>
-    } @if (showProfileForm) {
+    }
+
+    <div class="mt-3">
+      <a
+        class="btn btn-outline-success"
+        [routerLink]="['/events']"
+        [queryParams]="{ creator: user().id }"
+      >
+        Events created by {{ user().name }}
+        <i class="bi bi-envelope-arrow-up"></i>
+      </a>
+    </div>
+    <div class="mt-3">
+      <a
+        class="btn btn-outline-success"
+        [routerLink]="['/events']"
+        [queryParams]="{ attending: user().id }"
+      >
+        Events {{ user().name }} is attending
+        <i class="bi bi-person-check"></i>
+      </a>
+    </div>
+    @if (showProfileForm) {
     <div class="col-9" [formGroup]="profileDataForm">
       <form (submit)="putProfileInfo()">
         <div class="mb-3">

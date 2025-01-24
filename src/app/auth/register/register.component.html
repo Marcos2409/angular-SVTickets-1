@@ -37,7 +37,7 @@
     }
   </div>
 
-  @if (registerForm.get('emailGroup')?.errors?.['matchEmail']) {
+  @if (registerForm.errors?.['matchEmail']) {
   <div class="invalid-feedback">Emails must match!</div>
   }
 

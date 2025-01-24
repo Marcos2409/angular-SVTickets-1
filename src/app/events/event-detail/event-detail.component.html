@@ -10,7 +10,7 @@
   <div class="card-header" id="address">{{ event().address }}</div>
   <ol-map [coordinates]="coordinates()">
     <ol-marker [coordinates]="coordinates()"></ol-marker>
-  </ol-map>  
+  </ol-map>
 </div>
 
 @if(attendees()) {
@@ -45,30 +45,25 @@
   </ul>
 </div>
 
-} 
-
-@if(event().attend) {
-  <form class="mt-4" [formGroup]="commentForm" (submit)="postComment($event)">
-    <div class="form-group">
-      <textarea
-        class="form-control"
-        formControlName="message"
-        name="comment"
-        placeholder="Write a comment"
-      ></textarea>
-    </div>
-    <button 
-      type="submit" 
-      class="btn btn-primary mt-3" 
-      [disabled]="commentForm.invalid"
-    >
-      Send
-    </button>
-  </form>
-  }
-  
-
-@if (comments()) {
+} @if(event().attend) {
+<form class="mt-4" [formGroup]="commentForm" (submit)="postComment($event)">
+  <div class="form-group">
+    <textarea
+      class="form-control"
+      formControlName="message"
+      name="comment"
+      placeholder="Write a comment"
+    ></textarea>
+  </div>
+  <button
+    type="submit"
+    class="btn btn-primary mt-3"
+    [disabled]="commentForm.invalid"
+  >
+    Send
+  </button>
+</form>
+} @if (comments()) {
 <div class="card mt-4 mb-4">
   <div class="card-header bg-info text-white" id="address">Comment section</div>
   <ul class="list-group" id="userComments">

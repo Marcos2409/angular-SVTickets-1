@@ -2,7 +2,9 @@
   <div class="container-fluid">
     <ul class="nav">
       <li class="nav-item">
-        <button class="nav-link" (click)="orderDistance()">Order by distance</button>
+        <button class="nav-link" (click)="orderDistance()">
+          Order by distance
+        </button>
       </li>
       <li class="nav-item">
         <button class="nav-link" (click)="orderDate()">Order by date</button>
@@ -35,11 +37,11 @@
   }
 </div>
 
-
 <button
   class="btn btn-primary d-block mx-auto"
   (click)="loadMore()"
   [disabled]="!eventsLeft()"
 >
   Load More
+  <i class="bi bi-plus-square"></i>
 </button>

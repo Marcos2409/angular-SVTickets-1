@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input } from '@angular/core';
 import { OlMapDirective } from '../../shared/directives/ol-maps/ol-map.directive';
 import { OlMarkerDirective } from '../../shared/directives/ol-maps/ol-marker.directive';
 import { User, UserProfileEdit } from '../../shared/interfaces/user';
@@ -10,6 +10,7 @@ import {
 import { ProfileService } from '../services/profile.service';
 import { EncodeBase64Directive } from '../../shared/directives/encode-base64.directive';
 import { RouterLink, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'profile-page',
@@ -33,6 +34,7 @@ export class ProfilePageComponent {
 
   #fb = inject(NonNullableFormBuilder);
   #profileService = inject(ProfileService);
+  #destroyRef = inject(DestroyRef);
 
   profileDataForm = this.#fb.group({
     name: ['', Validators.required],
@@ -90,7 +92,7 @@ export class ProfilePageComponent {
 
     this.#profileService
       .updateProfile(userInfo)
-      .pipe()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe(() => {
         this.updateData();
       });
@@ -103,7 +105,7 @@ export class ProfilePageComponent {
 
     this.#profileService
       .updateUserPassword(newPassword)
-      .pipe()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe(() => this.updateData());
     this.hideFormButtons();
   }

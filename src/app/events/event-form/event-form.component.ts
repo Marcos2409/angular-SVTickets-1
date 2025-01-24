@@ -135,5 +135,3 @@ export class EventFormComponent implements CanComponentDeactivate {
     return this.#datePipe.transform(today, 'yyyy-MM-dd') || '';
   }
 }
-
-//TODO implement editing. If id providen to URI, edit that id event, if not, new event

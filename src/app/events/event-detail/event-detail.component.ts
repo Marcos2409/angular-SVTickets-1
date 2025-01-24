@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   effect,
   inject,
   input,
@@ -19,6 +20,7 @@ import {
 } from '@angular/forms';
 import { User } from '../../shared/interfaces/user';
 import { SingleCommentResponse } from '../../shared/interfaces/responses';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   standalone: true,
@@ -37,6 +39,7 @@ export class EventDetailComponent {
   #router = inject(Router);
   #eventService = inject(EventsService);
   #fb = inject(NonNullableFormBuilder);
+  #destroyRef = inject(DestroyRef);
 
   event = input.required<MyEvent>();
   coordinates = signal<[number, number]>([-0.5, 38.5]);
@@ -67,7 +70,7 @@ export class EventDetailComponent {
   setAttendees(id: number) {
     this.#eventService
       .getAttendees(id)
-      .pipe()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((result) => {
         this.attendees.set(result.users);
       });
@@ -76,7 +79,7 @@ export class EventDetailComponent {
   setComments(id: number) {
     this.#eventService
       .getComments(id)
-      .pipe()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((result) => {
         this.comments.set(result.comments);
       });
@@ -88,7 +91,7 @@ export class EventDetailComponent {
     const commentBody = comment.message;
     this.#eventService
       .postComment(this.event().id, commentBody)
-      .pipe()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((response) => {
         this.comments.update((comments) => [...comments, response]);
       });
