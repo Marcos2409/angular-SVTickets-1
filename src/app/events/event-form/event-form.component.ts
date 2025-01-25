@@ -92,8 +92,8 @@ export class EventFormComponent implements CanComponentDeactivate {
     const newEvent: MyEventInsert = {
       ...this.eventForm.getRawValue(),
       image: this.imageBase64,
-      lat: this.coordinates()[0],
-      lng: this.coordinates()[1],
+      lat: this.coordinates()[1],
+      lng: this.coordinates()[0],
       address: this.address
     };
 

@@ -14,6 +14,7 @@ import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProfileService } from '../../profile/services/profile.service';
+import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
 
 @Component({
   standalone: true,
@@ -21,6 +22,19 @@ import { ProfileService } from '../../profile/services/profile.service';
   imports: [EventCardComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './events-page.component.html',
   styleUrls: ['./events-page.component.css'],
+  animations: [
+    trigger('animateList', [
+      transition(':increment', [
+        query('product-item:enter', [ // Cuidado con el import de query (debe ser @angular/animations)
+          style({ opacity: 0, transform: 'translateX(-100px)' }),
+          stagger(
+            100,
+            animate('500ms ease-out', style({ opacity: 1, transform: 'none' }))
+          ),
+        ], {optional: true}),
+      ]),
+    ]),
+  ],
 })
 export class EventsPageComponent {
   #destroyRef = inject(DestroyRef);
@@ -33,6 +47,7 @@ export class EventsPageComponent {
   order = signal<string>('distance');
   creator = input<number>();
   attending = input<number>();
+  selected = false;
 
   searchControl = new FormControl('');
   search = toSignal(

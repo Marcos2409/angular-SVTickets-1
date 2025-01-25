@@ -62,7 +62,7 @@ export class EventDetailComponent {
     if (this.event()) {
       this.setAttendees(this.event().id);
       this.setComments(this.event().id);
-      this.coordinates.set([this.event().lat, this.event().lng]);
+      this.coordinates.set([this.event().lng, this.event().lat]);
       this.address.set(this.event().address);
     }
   }
