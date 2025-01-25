@@ -7,6 +7,13 @@ import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm-modal.component';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 
 @Component({
   standalone: true,
@@ -14,6 +21,13 @@ import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm
   imports: [DatePipe, IntlCurrencyPipe, RouterLink],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.css',
+  animations: [
+    trigger('scaleOnClick', [
+      state('default', style({ transform: 'scale(1)' })),
+      state('clicked', style({ transform: 'scale(1.1)' })),
+      transition('default <=> clicked', [animate('150ms ease-in-out')]),
+    ]),
+  ],
 })
 export class EventCardComponent {
   #eventsService = inject(EventsService);
@@ -29,7 +43,7 @@ export class EventCardComponent {
     const modalRef = this.#modal.open(ConfirmModalComponent);
     modalRef.componentInstance.title = 'Are you sure?';
     modalRef.componentInstance.body = 'Do you want to delete this event?';
-  
+
     modalRef.result
       .then((result) => {
         if (result) {
@@ -48,7 +62,6 @@ export class EventCardComponent {
         console.log('Event deletion canceled');
       });
   }
-  
 
   handleImageError(event: Event) {
     const target = event.target as HTMLImageElement;

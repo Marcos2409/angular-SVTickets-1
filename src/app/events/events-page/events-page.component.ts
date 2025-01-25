@@ -25,16 +25,16 @@ import { animate, query, stagger, style, transition, trigger } from '@angular/an
   animations: [
     trigger('animateList', [
       transition(':increment', [
-        query('product-item:enter', [ // Cuidado con el import de query (debe ser @angular/animations)
+        query('event-card:enter', [
           style({ opacity: 0, transform: 'translateX(-100px)' }),
           stagger(
             100,
             animate('500ms ease-out', style({ opacity: 1, transform: 'none' }))
           ),
-        ], {optional: true}),
+        ], { optional: true }),
       ]),
     ]),
-  ],
+  ]
 })
 export class EventsPageComponent {
   #destroyRef = inject(DestroyRef);
